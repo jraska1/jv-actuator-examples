@@ -1,0 +1,11 @@
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - metrics
+
+node:
+  name: node01
+  id: local:${node.name}

@@ -1,0 +1,14 @@
+
+management:
+  endpoint:
+    application:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - application
+
+node:
+  name: node01
+  id: local:${node.name}

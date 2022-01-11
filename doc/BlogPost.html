@@ -1,0 +1,294 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 7.2.5.2.0 (Linux)"/>
+	<meta name="created" content="2021-12-23T12:12:52.517403777"/>
+	<meta name="changed" content="2022-01-11T17:44:25.325359647"/>
+	<style type="text/css">
+		@page { margin: 0.79in }
+		p { line-height: 115%; margin-bottom: 0.1in; background: transparent }
+		h2.cjk { font-family: "Noto Sans CJK SC" }
+		h2.ctl { font-family: "Lohit Devanagari" }
+		pre.cjk { font-family: "Noto Sans Mono CJK SC", monospace }
+		h3.cjk { font-family: "Noto Sans CJK SC" }
+		h3.ctl { font-family: "Lohit Devanagari" }
+		a.cjk:link { so-language: zxx }
+		a.ctl:link { so-language: zxx }
+	</style>
+</head>
+<body lang="cs-CZ" dir="ltr"><p style="line-height: 100%; margin-bottom: 0in">
+<i>Vážení kolegové programátoři, ruku na srdce. Pro kolik z nás
+končí svět tím, že commit-ujeme své grandiózní dílo do Gitu.
+Vždyť dále se to jenom sestaví Jenkinsem, JAR se někam zkopíruje
+a spustí.</i></p>
+<p style="line-height: 100%; margin-bottom: 0in"><i>On ale ten svět
+po commit-u je daleko košatější a barvitější, než by na první
+pohled mohlo vypadat. Pokud se zeptáte kolegů ze support oddělení,
+budou vám jistě vyprávět hrůzostrašné historky z provozu
+aplikaci (samozřejmě že ne těch vašich).</i></p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Pokud vás to bude
+zajímat, pokusil bych se podívat na některé aspekty vývoje
+aplikace z pohledu jejího budoucího provozu.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Takto formulované
+zadání by bylo jistě hodně široké, takže si vyberu pouze úzkou
+část. Podívám se na podporu, kterou mně poskytuje framework
+<a class="western" href="https://spring.io/projects/spring-boot">Spring
+Boot</a> v oblasti provozu aplikace.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Framework tuto
+podporu skrývá pod označení <a class="western" href="https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html">Spring
+Boot Actuator</a>, nebo také „Production-ready Features“. 
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Jedná se o sadu
+nástrojů a rozšíření, které by vám měly pomoci při
+zjišťování informací o běžící aplikaci, stavu aplikace a
+jejich komponent, využití jejich služeb, monitorování provozu a
+podobně. 
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Zdrojové texty ke
+všem níže uvedeným příkladům najdete v Git repository:
+<a class="western" href="https://github.com/jraska1/jv-actuator-examples">jraska1/jv-actuator-examples</a></p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h2 class="western">Základní informace o Spring Boot Actuator</h2>
+<p style="line-height: 100%; margin-bottom: 0in">Framework Spring
+Boot poskytuje volitelnou podporu pro správu a monitorování
+aplikace za jejího běhu - Actuator. Jedná se o sadu nástrojů
+přístupných jako koncové body prostřednictvím rozhraní JMX
+nebo HTTP.</p>
+<p style="line-height: 100%; margin-bottom: 0in">Vzhledem k tomu, že
+nejsem velkým příznivcem JMX, zaměřím se v tomto článku pouze
+na přístup ke koncovým bodům prostřednictvím HTTP. Nicméně je
+dobré vědět, že tato možnost tady je.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="western">Zařazení Actuator do aplikace 
+</h3>
+<p style="line-height: 100%; margin-bottom: 0in">Abyste podporu mohli
+využít, musíte přidat do Maven projektu závislosti:</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><font size="1" style="font-size: 8pt"><font color="#080808"><font face="JetBrains Mono, monospace">&lt;</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace">dependency</font></font><font color="#080808"><font face="JetBrains Mono, monospace">&gt;</font></font></font></p>
+<pre class="western" style="background: #ffffff"><font color="#080808">    <font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">groupId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;org.springframework.boot&lt;/</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">groupId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;</font></font></font>
+<font color="#080808">    <font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">artifactId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;spring-boot-starter-web&lt;/</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">artifactId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;</font></font></font>
+<font color="#080808"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;/<font color="#0033b3">dependency</font>&gt;</font></font></font>
+<font color="#080808"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;<font color="#0033b3">dependency</font>&gt;</font></font></font>
+<font color="#080808">    <font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">groupId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;org.springframework.boot&lt;/</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">groupId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;</font></font></font>
+<font color="#080808">    <font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">artifactId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;spring-boot-starter-actuator&lt;/</font></font><font color="#0033b3"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">artifactId</font></font></font><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&gt;</font></font></font>
+<font color="#080808"><font face="JetBrains Mono, monospace"><font size="1" style="font-size: 8pt">&lt;/<font color="#0033b3">dependency</font>&gt;</font></font></font></pre><p style="line-height: 100%; margin-bottom: 0in">
+To je vše, co potřebujete udělat, aby se vám Actuator přidal do
+aplikace, inicioval po startu, a poskytl rozhraní přes HTTP.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Pokud si aplikaci
+spustíte, pak byste měli vidět něco takového:</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<pre class="western" style="line-height: 100%">[raska@fedora example-01]$ java -jar target/example-01-1.0.0.jar 
+
+  <font size="1" style="font-size: 8pt">.   ____          _            __ _ _</font>
+ <font size="1" style="font-size: 8pt">/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \</font>
+<font size="1" style="font-size: 8pt">( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \</font>
+ <font size="1" style="font-size: 8pt">\\/  ___)| |_)| | | | | || (_| |  ) ) ) )</font>
+  <font size="1" style="font-size: 8pt">'  |____| .__|_| |_|_| |_\__, | / / / /</font>
+ <font size="1" style="font-size: 8pt">=========|_|==============|___/=/_/_/_/</font>
+<font color="#26a269"> <font size="1" style="font-size: 8pt">:: Spring Boot :: </font>               (v2.6.1)</font>
+
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:01.140 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">c.d.a.example01.Application             </font> : Starting Application v1.0.0 using Java 11.0.13 on fedora with PID 10264 (/home/raska/IdeaProjects/jv-actuator-examples/example-01/target/example-01-1.0.0.jar started by raska in /home/raska/IdeaProjects/jv-actuator-examples/example-01)</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:01.142 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">c.d.a.example01.Application             </font> : No active profile set, falling back to default profiles: default</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:03.203 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">o.s.b.w.embedded.tomcat.TomcatWebServer </font> : Tomcat initialized with port(s): 8080 (http)</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:03.240 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">o.apache.catalina.core.StandardService  </font> : Starting service [Tomcat]</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:03.241 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">org.apache.catalina.core.StandardEngine </font> : Starting Servlet engine: [Apache Tomcat/9.0.55]</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:03.379 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">o.a.c.c.C.[Tomcat].[localhost].[/]      </font> : Initializing Spring embedded WebApplicationContext</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:03.379 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">w.s.c.ServletWebServerApplicationContext</font> : Root WebApplicationContext: initialization completed in 2092 ms</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:04.363 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">o.s.b.a.e.web.EndpointLinksResolver     </font> : Exposing 1 endpoint(s) beneath base path '/actuator'</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:04.446 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">o.s.b.w.embedded.tomcat.TomcatWebServer </font> : Tomcat started on port(s): 8080 (http) with context path ''</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:04.500 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">c.d.a.example01.Application             </font> : Started Application in 4.148 seconds (JVM running for 4.905)</font>
+<font size="1" style="font-size: 8pt"><font color="#aaaaaa">2022-01-09 12:56:04.646 </font><font color="#26a269"> INFO</font> <font color="#a347ba">10264</font> --- [           main] <font color="#2aa1b3">c.d.a.example01.Application             </font> : *** Hello World, greetings from Dwarf ***</font></pre><p style="line-height: 100%; margin-bottom: 0in">
+Z výpisu můžete vidět, že se nám něco rozjelo na URL
+<b>/actuator</b>. To je přístupový bod do HTTP rozhraní Actuator.
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Pokud se bavíme s
+nějakým koncovým bodem Actuator, pak je výsledkem vždy JSON
+objekt. Proto používám přehlednější formátování výstupu
+přes nástroj <b>jq</b>. 
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Nyní si již můžete
+zkusit s ním popovídat:</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<pre class="western" style="line-height: 100%">[raska@fedora ~]$ curl -s http://localhost:8080/actuator | jq .
+<font size="1" style="font-size: 8pt"><b>{</b></font>
+  <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;_links&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: {</b></font>
+    <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;self&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: {</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;href&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font color="#26a269"><font size="1" style="font-size: 8pt">&quot;http://localhost:8080/actuator&quot;</font></font><font size="1" style="font-size: 8pt"><b>,</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;templated&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font size="1" style="font-size: 8pt">false</font>
+    <font size="1" style="font-size: 8pt"><b>},</b></font>
+    <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;health-path&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: {</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;href&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font color="#26a269"><font size="1" style="font-size: 8pt">&quot;http://localhost:8080/actuator/health/{*path}&quot;</font></font><font size="1" style="font-size: 8pt"><b>,</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;templated&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font size="1" style="font-size: 8pt">true</font>
+    <font size="1" style="font-size: 8pt"><b>},</b></font>
+    <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;health&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: {</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;href&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font color="#26a269"><font size="1" style="font-size: 8pt">&quot;http://localhost:8080/actuator/health&quot;</font></font><font size="1" style="font-size: 8pt"><b>,</b></font>
+      <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;templated&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font size="1" style="font-size: 8pt">false</font>
+    <font size="1" style="font-size: 8pt"><b>}</b></font>
+  <font size="1" style="font-size: 8pt"><b>}</b></font>
+<font size="1" style="font-size: 8pt"><b>}</b></font></pre><h3 class="western">
+Povolení přístupových bodů a jejich vystavení 
+</h3>
+<p style="line-height: 100%; margin-bottom: 0in">Aby bylo možné
+využívat služeb přístupových bodů, je potřeba povolit jejich
+spuštění a následně také zpřístupnit je přes HTTP rozhraní.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Implicitní
+nastavení je takové, že všechny koncové body Actuator jsou při
+startu povoleny až na jednu výjimku, a tou je <b>shutdown</b>. 
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Současně však
+žádný koncový bod není zpřístupněn přes HTTP opět s jednou
+výjimkou, a tou je <b>health</b>.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">Takže si můžete
+vyzkoušet:</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<pre class="western" style="line-height: 100%">[raska@fedora ~]$ curl -s http://localhost:8080/actuator/health | jq .
+<font size="1" style="font-size: 8pt"><b>{</b></font>
+  <font color="#12488b"><font size="1" style="font-size: 8pt"><b>&quot;status&quot;</b></font></font><font size="1" style="font-size: 8pt"><b>: </b></font><font color="#26a269"><font size="1" style="font-size: 8pt">&quot;UP&quot;</font></font>
+<font size="1" style="font-size: 8pt"><b>}</b></font></pre><p style="line-height: 100%; margin-bottom: 0in">
+Povolení a zpřístupnění koncového bodu se provádí nastavením
+parametrů v <b>application.yaml</b><span style="font-weight: normal">:</span></p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><b>management.endpoint.&lt;id&gt;.enabled</b>
+– nastavením parametru na true/false</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><b>management.endpoints.web.exposure.include</b>
+– seznamu koncových bodů, které mají být přístupny přes
+webové rozhraní</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="font-weight: normal; line-height: 100%; margin-bottom: 0in">
+Vše bude zřejmější, pokud si ukážeme nastavení pro jednotlivé
+komponenty dále.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><span style="font-weight: normal">Ještě
+pro doplnění uvádím, že zde najdete <a class="western" href="https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html#actuator.endpoints">přehled
+koncových bodů</a>, které jsou k dispozici v rámci frameworku.</span></p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h2 class="western">Informace o aplikaci zjišťované za běhu</h2>
+<p style="line-height: 100%; margin-bottom: 0in">Příklady pro tuto
+kapitolu najdete v <a class="western" href="https://github.com/jraska1/jv-actuator-examples/example-01">jraska1/jv-actuator-examples/example-01</a>.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in">První oblastí, kde
+můžete služby Actuator použít, je zjišťování informací o
+aplikaci za jejího běhu.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="western">Informace o aplikaci 
+</h3>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="western">Přehled prostředí</h3>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h3 class="western">Seznam objektů ve Spring Context</h3>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h2 class="western">Sledování stavu aplikace a jejich komponent</h2>
+<p style="line-height: 100%; margin-bottom: 0in">Příklady pro tuto
+kapitolu najdete v <a class="western" href="https://github.com/jraska1/jv-actuator-examples/example-01">jraska1/jv-actuator-examples/example-0</a>2.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h2 class="western">Metriky provozu aplikace</h2>
+<p style="line-height: 100%; margin-bottom: 0in">Příklady pro tuto
+kapitolu najdete v <a class="western" href="https://github.com/jraska1/jv-actuator-examples/example-01">jraska1/jv-actuator-examples/example-0</a>3.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<h2 class="western">Zásahy do běžící aplikace</h2>
+<p style="line-height: 100%; margin-bottom: 0in">Příklady pro tuto
+kapitolu najdete v <a class="western" href="https://github.com/jraska1/jv-actuator-examples/example-01">jraska1/jv-actuator-examples/example-0</a>4.</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+<p style="line-height: 100%; margin-bottom: 0in"><br/>
+
+</p>
+</body>
+</html>

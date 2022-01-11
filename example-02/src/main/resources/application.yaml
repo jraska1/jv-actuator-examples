@@ -1,0 +1,18 @@
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - beans
+          - health
+          - loggers
+          - metrics
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+
+node:
+  name: node01
+  id: local:${node.name}
