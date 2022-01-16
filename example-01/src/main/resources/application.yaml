@@ -5,8 +5,8 @@ management:
       exposure:
         include:
           - info
-#          - env
-#          - beans
+          - env
+          - beans
   info:
     build:
       enabled: true
@@ -22,6 +22,7 @@ info:
     name: "@project.name@"
     description: "@project.description@"
     version: "@project.version@"
+    produced-by: "Dwarf's Software Workshop, 2022"
   source:
     target: "@java.version@"
     encoding: "@project.build.sourceEncoding@"

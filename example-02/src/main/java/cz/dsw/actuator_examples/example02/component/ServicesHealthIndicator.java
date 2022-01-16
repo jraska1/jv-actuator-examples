@@ -8,13 +8,16 @@ import cz.dsw.actuator_examples.example02.entity.service.ResponseB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
+@Profile("health-indicator")
 public class ServicesHealthIndicator implements HealthIndicator {
 
     @Autowired(required = false) List<ServiceProvider<RequestA, ResponseA>> providersA;
@@ -24,20 +27,16 @@ public class ServicesHealthIndicator implements HealthIndicator {
 
     @Override
     public Health health() {
-        boolean up = true;
         Map<String, Boolean> details = new HashMap<>();
 
-        if (providersA != null) {
+        if (providersA != null)
             for (ServiceProvider<RequestA, ResponseA> provider : providersA) {
                 RequestA request = factory.tokenInstance(RequestA.class);
                 request.setValue(0);
 
                 ResponseA response = provider.perform(request);
                 details.put(provider.getInstanceName(), response.getCode() == ResponseCodeType.OK);
-                if (response.getCode() != ResponseCodeType.OK)
-                    up = false;
             }
-        }
         if (providersB != null) {
             for (ServiceProvider<RequestB, ResponseB> provider : providersB) {
                 RequestB request = factory.tokenInstance(RequestB.class);
@@ -45,10 +44,8 @@ public class ServicesHealthIndicator implements HealthIndicator {
 
                 ResponseB response = provider.perform(request);
                 details.put(provider.getInstanceName(), response.getCode() == ResponseCodeType.OK);
-                if (response.getCode() != ResponseCodeType.OK)
-                    up = false;
             }
         }
-        return ((up) ? Health.up() : Health.down()).withDetails(details).build();
+        return ((details.values().stream().allMatch(b -> b)) ? Health.up() : Health.down()).withDetails(details).build();
     }
 }

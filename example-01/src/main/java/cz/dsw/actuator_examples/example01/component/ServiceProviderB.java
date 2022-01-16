@@ -6,6 +6,7 @@ import cz.dsw.actuator_examples.example01.entity.service.ResponseB;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+@Service
 public class ServiceProviderB implements ServiceProvider<RequestB, ResponseB> {
 
     @Autowired private TokenFactory factory;

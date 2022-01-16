@@ -27,7 +27,7 @@ public class ServiceProviderA implements ServiceProvider<RequestA, ResponseA> {
 
         ResponseA response = factory.tokenInstance(request.getTid(), ResponseA.class);
         response.setCode(ResponseCodeType.OK);
-        long value = request.getValue() + new Random().nextInt((int) Math.max(request.getValue() / divider, margin));
+        long value = new Random().nextInt((int) Math.max(Math.min(request.getValue() / divider, margin), 1));
         response.setResult(value);
         return response;
     }

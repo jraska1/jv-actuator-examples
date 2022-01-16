@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Random;
@@ -36,11 +37,13 @@ public class ServiceProviderA implements ServiceProvider<RequestA, ResponseA> {
     }
 
     @Bean
+    @Profile("service-metrics")
     public MeterBinder valueMean() {
         return (registry) -> Gauge.builder("services.A.mean", stat::getMean).register(registry);
     }
 
     @Bean
+    @Profile("service-metrics")
     public MeterBinder valueDeviation() {
         return (registry) -> Gauge.builder("services.A.deviation", stat::getStandardDeviation).register(registry);
     }

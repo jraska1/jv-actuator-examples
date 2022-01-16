@@ -8,6 +8,7 @@ import io.micrometer.core.instrument.binder.MeterBinder;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -33,11 +34,13 @@ public class ServiceProviderB implements ServiceProvider<RequestB, ResponseB> {
     }
 
     @Bean
+    @Profile("service-metrics")
     public MeterBinder valueMinimum() {
         return (registry) -> Gauge.builder("services.B.minimum", stat::getMin).register(registry);
     }
 
     @Bean
+    @Profile("service-metrics")
     public MeterBinder valueMaximum() {
         return (registry) -> Gauge.builder("services.B.maximum", stat::getMax).register(registry);
     }

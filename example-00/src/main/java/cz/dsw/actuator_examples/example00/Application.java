@@ -1,4 +1,4 @@
-package cz.dsw.actuator_examples.example03;
+package cz.dsw.actuator_examples.example00;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class Application {
+
     private static final Logger logger = LoggerFactory.getLogger(Application.class);
 
     public static void main(String[] args) {

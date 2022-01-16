@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+@Service
 public class ServiceProviderA implements ServiceProvider<RequestA, ResponseA> {
 
     @Autowired private TokenFactory factory;

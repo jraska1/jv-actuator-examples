@@ -9,6 +9,7 @@
         <module>example-02</module>
         <module>example-03</module>
         <module>example-04</module>
+        <module>example-00</module>
     </modules>
 
     <parent>

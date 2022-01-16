@@ -10,15 +10,8 @@
         <version>1.0.0</version>
     </parent>
 
-    <artifactId>example-02</artifactId>
+    <artifactId>example-00</artifactId>
 
-    <name>Spring Boot Actuator Example 02</name>
-    <description>Spring Boot Actuator Examples in Java and Spring Boot - Application Health</description>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-    </dependencies>
+    <name>Spring Boot Actuator Example 00</name>
+    <description>Spring Boot Actuator Examples in Java and Spring Boot - Default Settings</description>
 </project>

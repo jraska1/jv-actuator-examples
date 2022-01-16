@@ -4,9 +4,11 @@ import cz.dsw.actuator_examples.example02.entity.ResponseCodeType;
 import cz.dsw.actuator_examples.example02.entity.service.RequestA;
 import cz.dsw.actuator_examples.example02.entity.service.ResponseA;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-//@Service
+@Service
+@Profile("service-flowed")
 public class ServiceProviderAFlawed implements ServiceProvider<RequestA, ResponseA> {
 
     @Autowired private TokenFactory factory;
